@@ -83,7 +83,7 @@ export class MyDurableObject extends DurableObject<Env> {
         let num = 0
         while(true){
             num = num + 1;
-            if(num > 999999999999999999999999999){
+            if(num > 999999999){
                 break;
             }
         }
