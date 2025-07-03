@@ -65,11 +65,13 @@ export class MyDurableObject extends DurableObject<Env> {
 
 
     async increment(amount = 1) {
+        let value: number = (await this.ctx.storage.get("value")) || 0;
+
         console.log("进入=",new Date().toISOString());
         let lockKeyValue = await this.ctx.storage.get("value");
         console.log("lockKeyValue=", lockKeyValue);
 
-        let value: number = (await this.ctx.storage.get("value")) || 0;
+        
         value += amount;
         // You do not have to worry about a concurrent request having modified the value in storage.
         // "input gates" will automatically protect against unwanted concurrency.
