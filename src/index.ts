@@ -43,21 +43,20 @@ export class MyDurableObject extends DurableObject<Env> {
         return result.greeting;
     }
 
-    async lock(lockKey: string): Promise<[boolean,string]> {
+    async lock(lockKey: string): Promise<[boolean, string]> {
         let lockKeyValue = await this.ctx.storage.get(lockKey);
         console.log("lockKeyValue=", lockKeyValue);
-        // if (lockKeyValue) {
-        //     console.log("加锁失败");
-        //     return [false,new Date().toISOString()];
-        // }
+        if (lockKeyValue) {
+            console.log("加锁失败");
+            return [false, new Date().toISOString()];
+        }
         await this.ctx.storage.put(lockKey, 1);
 
         // console.log("任务正在执行");
         // await sleep(10000);
         // console.log("任务执行完成");
         //模拟业务执行耗时
-        await sleep(2000);
-        return [true,new Date().toISOString()];
+        return [true, new Date().toISOString()];
     }
     async unlock(lockKey: string): Promise<boolean> {
         await this.ctx.storage.delete(lockKey);
@@ -145,11 +144,16 @@ export default {
         // stub.unlock(lockKey);
         // console.log("解锁成功成功");
         const [lockFlag, dateStr] = await stub.lock(lockKey);
-        if (lockFlag) {
-            console.log("加锁成功");
-        } else {
-            console.log("加锁失败");
+        while (true) {
+            if (lockFlag) {
+                break;
+            }
         }
+        console.log("执行耗时业务");
+        await sleep(2000);
+        console.log("执行耗时业务-完成-解锁");
+        stub.unlock(lockKey);
+        
         //let lockFlag = await stub.increment();
         return new Response(`Durable Object: ${lockFlag}  时间=${dateStr}`);
     },
