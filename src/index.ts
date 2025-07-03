@@ -43,20 +43,20 @@ export class MyDurableObject extends DurableObject<Env> {
         return result.greeting;
     }
 
-    async lock(lockKey: string): Promise<boolean> {
+    async lock(lockKey: string): Promise<[boolean,string]> {
         let lockKeyValue = await this.ctx.storage.get(lockKey);
         console.log("lockKeyValue=", lockKeyValue);
         if (lockKeyValue) {
             console.log("加锁失败");
-            return false;
+            return [false,new Date().toISOString()];
         }
         await this.ctx.storage.put(lockKey, 1);
 
         // console.log("任务正在执行");
         // await sleep(10000);
         // console.log("任务执行完成");
-
-        return true;
+        await sleep(2000);
+        return [true,new Date().toISOString()];
     }
     async unlock(lockKey: string): Promise<boolean> {
         await this.ctx.storage.delete(lockKey);
@@ -143,13 +143,13 @@ export default {
 
         // stub.unlock(lockKey);
         // console.log("解锁成功成功");
-        const lockFlag = await stub.lock(lockKey);
+        const [lockFlag, dateStr] = await stub.lock(lockKey);
         if (lockFlag) {
             console.log("加锁成功");
         } else {
             console.log("加锁失败");
         }
         //let lockFlag = await stub.increment();
-        return new Response(`Durable Object: ${lockFlag}`);
+        return new Response(`Durable Object: ${lockFlag}  时间=${dateStr}`);
     },
 } satisfies ExportedHandler<Env>;
