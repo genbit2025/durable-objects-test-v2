@@ -78,6 +78,7 @@ export class MyDurableObject extends DurableObject<Env> {
 
         console.log("任务正在执行");
         await sleep(2000);
+        console.log("任务执行完成");
         return value;
     }
 }
