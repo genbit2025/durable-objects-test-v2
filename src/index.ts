@@ -45,6 +45,7 @@ export class MyDurableObject extends DurableObject<Env> {
 
     async lock(lockKey: string): Promise<boolean> {
         let lockKeyValue = await this.ctx.storage.get("value");
+        console.log("lockKeyValue=", lockKeyValue);
         if (lockKeyValue) {
             return false;
         }
@@ -96,7 +97,7 @@ export default {
         const lockFlag = await stub.lock(lockKey);
         if (lockFlag) {
             console.log("加锁成功");
-        }else{
+        } else {
             return new Response(
                 "用户正在执行，，，请稍后",
             );
