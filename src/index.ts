@@ -13,7 +13,7 @@ import { DurableObject } from "cloudflare:workers";
  * Learn more at https://developers.cloudflare.com/durable-objects
  */
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 /** A Durable Object's behavior is defined in an exported Javascript class */
 export class MyDurableObject extends DurableObject<Env> {
@@ -54,13 +54,23 @@ export default {
      * @returns The response to be sent back to the client
      */
     async fetch(request, env, ctx): Promise<Response> {
+
+        let url = new URL(request.url);
+        let userId = url.searchParams.get("userId");
+        if (!userId) {
+            return new Response(
+                "Select a Durable Object to contact by using" +
+                " the `userId` URL query string parameter, for example, ?userId=A",
+            );
+        }
+        let id = env.MY_DURABLE_OBJECT.idFromName(userId);
         // Create a `DurableObjectId` for an instance of the `MyDurableObject`
         // class. The name of class is used to identify the Durable Object.
         // Requests from all Workers to the instance named
         // will go to a single globally unique Durable Object instance.
-        const id: DurableObjectId = env.MY_DURABLE_OBJECT.idFromName(
-            new URL(request.url).pathname,
-        );
+        // const id: DurableObjectId = env.MY_DURABLE_OBJECT.idFromName(
+        //     new URL(request.url).pathname,
+        // );
 
         // Create a stub to open a communication channel with the Durable
         // Object instance.
