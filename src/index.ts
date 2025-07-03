@@ -63,19 +63,19 @@ export class MyDurableObject extends DurableObject<Env> {
         return true;
     }
 
-    // async increment(amount = 1) {
-    //     let lockKeyValue = await this.ctx.storage.get("value");
-    //     console.log("lockKeyValue=", lockKeyValue);
-    //     await this.ctx.storage.put(lockKey, "1");
 
-    //     let value: number = (await this.ctx.storage.get("value")) || 0;
-    //     value += amount;
-    //     // You do not have to worry about a concurrent request having modified the value in storage.
-    //     // "input gates" will automatically protect against unwanted concurrency.
-    //     // Read-modify-write is safe.
-    //     await this.ctx.storage.put("value", value);
-    //     return value;
-    // }
+    async increment(amount = 1) {
+        let lockKeyValue = await this.ctx.storage.get("value");
+        console.log("lockKeyValue=", lockKeyValue);
+
+        let value: number = (await this.ctx.storage.get("value")) || 0;
+        value += amount;
+        // You do not have to worry about a concurrent request having modified the value in storage.
+        // "input gates" will automatically protect against unwanted concurrency.
+        // Read-modify-write is safe.
+        await this.ctx.storage.put("value", value);
+        return value;
+    }
 }
 
 export default {
@@ -114,14 +114,14 @@ export default {
         // Call the `sayHello()` RPC method on the stub to invoke the method on
         // the remote Durable Object instance
         //const greeting = await stub.sayHello();
-        const lockFlag = await stub.lock(lockKey);
-        if (lockFlag) {
-            console.log("加锁成功");
-        } else {
-            return new Response(
-                `用户正在执行，，，请稍后 ${lockFlag}`,
-            );
-        }
+        // const lockFlag = await stub.lock(lockKey);
+        // if (lockFlag) {
+        //     console.log("加锁成功");
+        // } else {
+        //     return new Response(
+        //         `用户正在执行，，，请稍后 ${lockFlag}`,
+        //     );
+        // }
 
         // //模拟业务正在处理，睡眠10s
         // console.log("任务正在执行");
@@ -130,7 +130,7 @@ export default {
         // stub.unlock(lockKey);
         // console.log("解锁成功成功");
 
-        //let count = await stub.increment();
+        let lockFlag = await stub.increment();
         return new Response(`Durable Object: ${lockFlag}`);
     },
 } satisfies ExportedHandler<Env>;
