@@ -93,9 +93,13 @@ export default {
         // Call the `sayHello()` RPC method on the stub to invoke the method on
         // the remote Durable Object instance
         //const greeting = await stub.sayHello();
-        const lockFlag = await stub.lock();
+        const lockFlag = await stub.lock(lockKey);
         if (lockFlag) {
             console.log("加锁成功");
+        }else{
+            return new Response(
+                "用户正在执行，，，请稍后",
+            );
         }
 
         //模拟业务正在处理，睡眠10s
