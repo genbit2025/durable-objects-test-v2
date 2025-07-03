@@ -50,7 +50,7 @@ export class MyDurableObject extends DurableObject<Env> {
             console.log("加锁失败");
             return false;
         }
-        await this.ctx.storage.put(lockKey, "1");
+        await this.ctx.storage.put(lockKey, 1);
 
         // console.log("任务正在执行");
         // await sleep(10000);
@@ -67,7 +67,7 @@ export class MyDurableObject extends DurableObject<Env> {
     async increment(amount = 1) {
         let value: number = (await this.ctx.storage.get("value")) || 0;
 
-        console.log("进入=",new Date().toISOString());
+        console.log("进入=", new Date().toISOString());
         let lockKeyValue = await this.ctx.storage.get("value");
         console.log("lockKeyValue=", lockKeyValue);
 
@@ -81,9 +81,9 @@ export class MyDurableObject extends DurableObject<Env> {
         console.log("任务正在执行");
         //await sleep(2000);
         let num = 0
-        while(true){
+        while (true) {
             num = num + 1;
-            if(num > 999999999){
+            if (num > 999999999) {
                 break;
             }
         }
@@ -112,7 +112,7 @@ export default {
             );
         }
         let lockKey = "lock_userId_1111";
-        let id = env.MY_DURABLE_OBJECT.idFromName(lockKey);
+        let id = env.MY_DURABLE_OBJECT.idFromName(userId);
         // Create a `DurableObjectId` for an instance of the `MyDurableObject`
         // class. The name of class is used to identify the Durable Object.
         // Requests from all Workers to the instance named
@@ -143,8 +143,13 @@ export default {
 
         // stub.unlock(lockKey);
         // console.log("解锁成功成功");
-
-        let lockFlag = await stub.increment();
+        const lockFlag = await stub.lock(lockKey);
+        if (lockFlag) {
+            console.log("加锁成功");
+        } else {
+            console.log("加锁失败");
+        }
+        //let lockFlag = await stub.increment();
         return new Response(`Durable Object: ${lockFlag}`);
     },
 } satisfies ExportedHandler<Env>;
