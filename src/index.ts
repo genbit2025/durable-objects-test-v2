@@ -119,7 +119,7 @@ export default {
             console.log("加锁成功");
         } else {
             return new Response(
-                "用户正在执行，，，请稍后",
+                `用户正在执行，，，请稍后 ${lockFlag}`,
             );
         }
 
