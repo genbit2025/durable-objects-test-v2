@@ -42,6 +42,19 @@ export class MyDurableObject extends DurableObject<Env> {
         await sleep(10000);
         return result.greeting;
     }
+
+    async lock(lockKey: string): Promise<boolean> {
+        let lockKeyValue = await this.ctx.storage.get("value");
+        if (lockKeyValue) {
+            return false;
+        }
+        await this.ctx.storage.put(lockKey, "1");
+        return true;
+    }
+    async unlock(lockKey: string): Promise<boolean> {
+        await this.ctx.storage.delete(lockKey);
+        return true;
+    }
 }
 
 export default {
@@ -63,7 +76,8 @@ export default {
                 " the `userId` URL query string parameter, for example, ?userId=A",
             );
         }
-        let id = env.MY_DURABLE_OBJECT.idFromName(userId);
+        let lockKey = "lock_userId_1111";
+        let id = env.MY_DURABLE_OBJECT.idFromName(lockKey);
         // Create a `DurableObjectId` for an instance of the `MyDurableObject`
         // class. The name of class is used to identify the Durable Object.
         // Requests from all Workers to the instance named
@@ -78,8 +92,18 @@ export default {
 
         // Call the `sayHello()` RPC method on the stub to invoke the method on
         // the remote Durable Object instance
-        const greeting = await stub.sayHello();
+        //const greeting = await stub.sayHello();
+        const lockFlag = await stub.lock();
+        if (lockFlag) {
+            console.log("加锁成功");
+        }
 
-        return new Response(greeting);
+        //模拟业务正在处理，睡眠10s
+        console.log("任务正在执行");
+        await sleep(10000);
+
+        stub.unlock(lockKey);
+        console.log("解锁成功成功");
+        return new Response("段超");
     },
 } satisfies ExportedHandler<Env>;
