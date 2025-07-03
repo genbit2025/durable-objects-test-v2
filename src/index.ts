@@ -65,7 +65,7 @@ export class MyDurableObject extends DurableObject<Env> {
 
 
     async increment(amount = 1) {
-        console.log("进入")
+        console.log("进入=",console.log(new Date().toISOString()))
         let lockKeyValue = await this.ctx.storage.get("value");
         console.log("lockKeyValue=", lockKeyValue);
 
