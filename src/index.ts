@@ -47,9 +47,15 @@ export class MyDurableObject extends DurableObject<Env> {
         let lockKeyValue = await this.ctx.storage.get("value");
         console.log("lockKeyValue=", lockKeyValue);
         if (lockKeyValue) {
+            console.log("加锁失败");
             return false;
         }
         await this.ctx.storage.put(lockKey, "1");
+
+        console.log("任务正在执行");
+        await sleep(10000);
+        console.log("任务执行完成");
+        
         return true;
     }
     async unlock(lockKey: string): Promise<boolean> {
@@ -103,12 +109,12 @@ export default {
             );
         }
 
-        //模拟业务正在处理，睡眠10s
-        console.log("任务正在执行");
-        await sleep(10000);
+        // //模拟业务正在处理，睡眠10s
+        // console.log("任务正在执行");
+        // await sleep(10000);
 
-        stub.unlock(lockKey);
-        console.log("解锁成功成功");
+        // stub.unlock(lockKey);
+        // console.log("解锁成功成功");
         return new Response("段超");
     },
 } satisfies ExportedHandler<Env>;
