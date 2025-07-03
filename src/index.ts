@@ -44,7 +44,7 @@ export class MyDurableObject extends DurableObject<Env> {
     }
 
     async lock(lockKey: string): Promise<boolean> {
-        let lockKeyValue = await this.ctx.storage.get("value");
+        let lockKeyValue = await this.ctx.storage.get(lockKey);
         console.log("lockKeyValue=", lockKeyValue);
         if (lockKeyValue) {
             console.log("加锁失败");
@@ -52,9 +52,9 @@ export class MyDurableObject extends DurableObject<Env> {
         }
         await this.ctx.storage.put(lockKey, "1");
 
-        console.log("任务正在执行");
-        await sleep(10000);
-        console.log("任务执行完成");
+        // console.log("任务正在执行");
+        // await sleep(10000);
+        // console.log("任务执行完成");
 
         return true;
     }
@@ -63,15 +63,19 @@ export class MyDurableObject extends DurableObject<Env> {
         return true;
     }
 
-    async increment(amount = 1) {
-        let value: number = (await this.ctx.storage.get("value")) || 0;
-        value += amount;
-        // You do not have to worry about a concurrent request having modified the value in storage.
-        // "input gates" will automatically protect against unwanted concurrency.
-        // Read-modify-write is safe.
-        await this.ctx.storage.put("value", value);
-        return value;
-    }
+    // async increment(amount = 1) {
+    //     let lockKeyValue = await this.ctx.storage.get("value");
+    //     console.log("lockKeyValue=", lockKeyValue);
+    //     await this.ctx.storage.put(lockKey, "1");
+
+    //     let value: number = (await this.ctx.storage.get("value")) || 0;
+    //     value += amount;
+    //     // You do not have to worry about a concurrent request having modified the value in storage.
+    //     // "input gates" will automatically protect against unwanted concurrency.
+    //     // Read-modify-write is safe.
+    //     await this.ctx.storage.put("value", value);
+    //     return value;
+    // }
 }
 
 export default {
@@ -110,14 +114,14 @@ export default {
         // Call the `sayHello()` RPC method on the stub to invoke the method on
         // the remote Durable Object instance
         //const greeting = await stub.sayHello();
-        // const lockFlag = await stub.lock(lockKey);
-        // if (lockFlag) {
-        //     console.log("加锁成功");
-        // } else {
-        //     return new Response(
-        //         "用户正在执行，，，请稍后",
-        //     );
-        // }
+        const lockFlag = await stub.lock(lockKey);
+        if (lockFlag) {
+            console.log("加锁成功");
+        } else {
+            return new Response(
+                "用户正在执行，，，请稍后",
+            );
+        }
 
         // //模拟业务正在处理，睡眠10s
         // console.log("任务正在执行");
