@@ -55,6 +55,7 @@ export class MyDurableObject extends DurableObject<Env> {
         // console.log("任务正在执行");
         // await sleep(10000);
         // console.log("任务执行完成");
+        //模拟业务执行耗时
         await sleep(2000);
         return [true,new Date().toISOString()];
     }
