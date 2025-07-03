@@ -130,7 +130,7 @@ export default {
         // stub.unlock(lockKey);
         // console.log("解锁成功成功");
 
-        let count = await stub.increment();
-        return new Response(`Durable Object count: ${count}`);
+        //let count = await stub.increment();
+        return new Response(`Durable Object: ${lockFlag}`);
     },
 } satisfies ExportedHandler<Env>;
