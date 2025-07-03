@@ -65,6 +65,7 @@ export class MyDurableObject extends DurableObject<Env> {
 
 
     async increment(amount = 1) {
+        console.log("进入")
         let lockKeyValue = await this.ctx.storage.get("value");
         console.log("lockKeyValue=", lockKeyValue);
 
@@ -74,6 +75,9 @@ export class MyDurableObject extends DurableObject<Env> {
         // "input gates" will automatically protect against unwanted concurrency.
         // Read-modify-write is safe.
         await this.ctx.storage.put("value", value);
+
+        console.log("任务正在执行");
+        await sleep(2000);
         return value;
     }
 }
