@@ -1,4 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
+import { SignJWT, jwtVerify } from 'jose';
 
 /**
  * Welcome to Cloudflare Workers! This is your first Durable Objects application.
@@ -124,6 +125,7 @@ export class MyDurableObject extends DurableObject<Env> {
         return value;
     }
 }
+const secret = new TextEncoder().encode('your-256-bit-secret')
 
 export default {
     /**
@@ -139,6 +141,16 @@ export default {
         let url = new URL(request.url);
         let userId = url.searchParams.get("userId");
         console.log("userId=", userId);
+
+        if (url.pathname === '/user/quickLogin') {
+            const token = await new SignJWT({ user: 'dcdcdc' })
+                .setProtectedHeader({ alg: 'HS256' })
+                .setIssuedAt()
+                .setExpirationTime('2h')
+                .sign(secret)
+
+            return new Response(JSON.stringify({ token }), { headers: { 'Content-Type': 'application/json' } })
+        }
 
         if (!userId) {
             return new Response(
