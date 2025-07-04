@@ -197,6 +197,14 @@ export default {
         //await stub.runBiz(userId);
 
         //let lockFlag = await stub.increment();
-        return new Response(`Durable Object: ${localLockFlag}  时间=${localDateStr}`);
+
+
+        const stmt = env.DB.prepare("SELECT * FROM user");
+        const dbData = await stmt.run();
+        console.log("sql query returnValue=", JSON.stringify(dbData));
+
+
+        
+        return new Response(`Durable Object: ${localLockFlag}  时间=${localDateStr}，数据=${dbData}`);
     },
 } satisfies ExportedHandler<Env>;

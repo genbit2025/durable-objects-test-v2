@@ -1,24 +1,33 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "durable-objects-test-v2",
-  "main": "src/index.ts",
-  "compatibility_date": "2025-04-01",
-  "upload_source_maps": true,
-  "migrations": [
-    {
-      "new_sqlite_classes": ["MyDurableObject"],
-      "tag": "v1"
-    }
-  ],
-  "durable_objects": {
-    "bindings": [
-      {
-        "class_name": "MyDurableObject",
-        "name": "MY_DURABLE_OBJECT"
-      }
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "durable-objects-test-v2",
+    "main": "src/index.ts",
+    "compatibility_date": "2025-04-01",
+    "upload_source_maps": true,
+    "migrations": [
+        {
+            "new_sqlite_classes": [
+                "MyDurableObject"
+            ],
+            "tag": "v1"
+        }
+    ],
+    "durable_objects": {
+        "bindings": [
+            {
+                "class_name": "MyDurableObject",
+                "name": "MY_DURABLE_OBJECT"
+            }
+        ]
+    },
+    "observability": {
+        "enabled": true
+    },
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "test_db",
+            "database_id": "895db7b3-ef54-4fdc-a2ff-d8a05b8973d0"
+        }
     ]
-  },
-  "observability": {
-    "enabled": true
-  }
 }
