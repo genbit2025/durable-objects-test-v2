@@ -58,6 +58,34 @@ export class MyDurableObject extends DurableObject<Env> {
         //模拟业务执行耗时
         return [true, new Date().toISOString()];
     }
+
+    /**
+     * 模拟运行一个业务逻辑
+     * @param lockKey 
+     * @returns 
+     */
+    async runBiz(lockKey: string) {
+        let lockKeyValue = await this.ctx.storage.get(lockKey);
+        console.log("lockKeyValue=", lockKeyValue);
+        if (lockKeyValue) {
+            console.log("加锁失败");
+            return [false, new Date().toISOString()];
+        }
+        //await this.ctx.storage.put(lockKey, 1);
+
+        console.log("任务正在执行");
+        await sleep(2000);
+        console.log("任务执行完成");
+
+        console.log("删除key=", lockKey);
+        await this.ctx.storage.delete(lockKey);
+        let lockKeyValue2 = await this.ctx.storage.get(lockKey);
+        console.log("删除后获取lockKeyValue2=", lockKeyValue2);
+
+        return [true, new Date().toISOString()];
+    }
+
+
     async unlock(lockKey: string) {
         console.log("删除key=", lockKey);
         await this.ctx.storage.delete(lockKey);
@@ -150,19 +178,21 @@ export default {
         // console.log("解锁成功成功");
         let localLockFlag;
         let localDateStr;
-        while (true) {
-            const [lockFlag, dateStr] = await stub.mylock(userId);
-            localLockFlag = lockFlag;
-            localDateStr = dateStr;
-            if (lockFlag) {
-                break;
-            }
-            await sleep(200);
-        }
-        console.log("执行耗时业务");
-        await sleep(2000);
-        console.log("执行耗时业务-完成-解锁");
-        await stub.unlock(userId);
+        // while (true) {
+        //     const [lockFlag, dateStr] = await stub.mylock(userId);
+        //     localLockFlag = lockFlag;
+        //     localDateStr = dateStr;
+        //     if (lockFlag) {
+        //         break;
+        //     }
+        //     await sleep(200);
+        // }
+        // console.log("执行耗时业务");
+        // await sleep(2000);
+        // console.log("执行耗时业务-完成-解锁");
+        // await stub.unlock(userId);
+
+        await stub.runBiz(userId);
 
         //let lockFlag = await stub.increment();
         return new Response(`Durable Object: ${localLockFlag}  时间=${localDateStr}`);
