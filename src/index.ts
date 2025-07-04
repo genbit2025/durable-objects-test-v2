@@ -206,6 +206,6 @@ export default {
 
 
         
-        return new Response(`Durable Object: ${localLockFlag}  时间=${localDateStr}，数据=${dbDataStr}`);
+        return new Response(`Durable Object 加锁标识: ${localLockFlag}  时间=${localDateStr}，数据=${dbDataStr}`);
     },
 } satisfies ExportedHandler<Env>;
