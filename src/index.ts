@@ -59,7 +59,10 @@ export class MyDurableObject extends DurableObject<Env> {
         return [true, new Date().toISOString()];
     }
     async unlock(lockKey: string) {
+        console.log("删除key=", lockKey);
         await this.ctx.storage.delete(lockKey);
+        let lockKeyValue = await this.ctx.storage.get(lockKey);
+        console.log("删除后获取lockKeyValue=", lockKeyValue);
         return true;
     }
 
@@ -105,6 +108,7 @@ export default {
 
         let url = new URL(request.url);
         let userId = url.searchParams.get("userId");
+        console.log("userId=", userId);
         if (!userId) {
             return new Response(
                 "Select a Durable Object to contact by using" +
