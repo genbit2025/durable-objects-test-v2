@@ -201,10 +201,11 @@ export default {
 
         const stmt = env.DB.prepare("SELECT * FROM user");
         const dbData = await stmt.run();
-        console.log("sql query returnValue=", JSON.stringify(dbData));
+        const dbDataStr = JSON.stringify(dbData);
+        console.log("sql query returnValue=", dbDataStr);
 
 
         
-        return new Response(`Durable Object: ${localLockFlag}  时间=${localDateStr}，数据=${dbData}`);
+        return new Response(`Durable Object: ${localLockFlag}  时间=${localDateStr}，数据=${dbDataStr}`);
     },
 } satisfies ExportedHandler<Env>;
