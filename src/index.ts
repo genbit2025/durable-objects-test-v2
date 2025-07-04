@@ -109,6 +109,7 @@ export default {
         let url = new URL(request.url);
         let userId = url.searchParams.get("userId");
         console.log("userId=", userId);
+        
         if (!userId) {
             return new Response(
                 "Select a Durable Object to contact by using" +
