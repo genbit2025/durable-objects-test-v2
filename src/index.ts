@@ -109,7 +109,7 @@ export default {
         let url = new URL(request.url);
         let userId = url.searchParams.get("userId");
         console.log("userId=", userId);
-        
+
         if (!userId) {
             return new Response(
                 "Select a Durable Object to contact by using" +
@@ -162,7 +162,7 @@ export default {
         console.log("执行耗时业务");
         await sleep(2000);
         console.log("执行耗时业务-完成-解锁");
-        stub.unlock(userId);
+        await stub.unlock(userId);
 
         //let lockFlag = await stub.increment();
         return new Response(`Durable Object: ${localLockFlag}  时间=${localDateStr}`);
