@@ -170,7 +170,7 @@ export default {
                 code: 0,
                 body: {
                     token: token,
-                    userList: dbData
+                    userList: dbData.results
                 }
             };
             return new Response(JSON.stringify(rt_data), { headers: { 'Content-Type': 'application/json' } })
