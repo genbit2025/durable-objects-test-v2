@@ -234,6 +234,6 @@ export default {
 
         //let lockFlag = await stub.increment();
 
-        return new Response(`Durable Object 加锁标识: ${localLockFlag}  时间=${localDateStr}，数据=${dbDataStr}`);
+        return new Response(`Durable Object 加锁标识: ${localLockFlag}  时间=${localDateStr}`);
     },
 } satisfies ExportedHandler<Env>;
