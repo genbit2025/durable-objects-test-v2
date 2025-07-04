@@ -34,7 +34,7 @@ export class MyDurableObject extends DurableObject<Env> {
      *
      * @returns The greeting to be sent back to the Worker
      */
-    async sayHello(): Promise<string> {
+    async sayHello() {
         let result = this.ctx.storage.sql
             .exec("SELECT 'Hello, World!段超' as greeting")
             .one() as { greeting: string };
@@ -43,7 +43,7 @@ export class MyDurableObject extends DurableObject<Env> {
         return result.greeting;
     }
 
-    async lock(lockKey: string): Promise<[boolean, string]> {
+    async mylock(lockKey: string) {
         let lockKeyValue = await this.ctx.storage.get(lockKey);
         console.log("lockKeyValue=", lockKeyValue);
         if (lockKeyValue) {
@@ -58,7 +58,7 @@ export class MyDurableObject extends DurableObject<Env> {
         //模拟业务执行耗时
         return [true, new Date().toISOString()];
     }
-    async unlock(lockKey: string): Promise<boolean> {
+    async unlock(lockKey: string) {
         await this.ctx.storage.delete(lockKey);
         return true;
     }
@@ -111,7 +111,7 @@ export default {
                 " the `userId` URL query string parameter, for example, ?userId=A",
             );
         }
-        let lockKey = "lock_userId_1111";
+        //let lockKey = "lock_userId_1111";
         let id = env.MY_DURABLE_OBJECT.idFromName(userId);
         // Create a `DurableObjectId` for an instance of the `MyDurableObject`
         // class. The name of class is used to identify the Durable Object.
@@ -143,18 +143,23 @@ export default {
 
         // stub.unlock(lockKey);
         // console.log("解锁成功成功");
-        const [lockFlag, dateStr] = await stub.lock(lockKey);
+        let localLockFlag;
+        let localDateStr;
         while (true) {
+            const [lockFlag, dateStr] = await stub.mylock(userId);
+            localLockFlag = lockFlag;
+            localDateStr = dateStr;
             if (lockFlag) {
                 break;
             }
+            await sleep(200);
         }
         console.log("执行耗时业务");
         await sleep(2000);
         console.log("执行耗时业务-完成-解锁");
-        stub.unlock(lockKey);
-        
+        stub.unlock(userId);
+
         //let lockFlag = await stub.increment();
-        return new Response(`Durable Object: ${lockFlag}  时间=${dateStr}`);
+        return new Response(`Durable Object: ${localLockFlag}  时间=${localDateStr}`);
     },
 } satisfies ExportedHandler<Env>;
