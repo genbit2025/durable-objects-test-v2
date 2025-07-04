@@ -142,6 +142,19 @@ export default {
         let userId = url.searchParams.get("userId");
         console.log("userId=", userId);
 
+        try {
+            // 你的业务代码
+            console.log("执行业务代码....");
+            throw new Error("这是一个测试错误");
+        } catch (err) {
+            if (err instanceof Error) {
+                console.error("发生错误:", err.message);
+                console.error("堆栈信息:\n" + err.stack);
+            } else {
+                console.error("未知错误:", err);
+            }
+        }
+
         if (url.pathname === '/user/quickLogin') {
             const token = await new SignJWT({ user: 'dcdcdc' })
                 .setProtectedHeader({ alg: 'HS256' })
@@ -217,7 +230,7 @@ export default {
         console.log("sql query returnValue=", dbDataStr);
 
 
-        
+
         return new Response(`Durable Object 加锁标识: ${localLockFlag}  时间=${localDateStr}，数据=${dbDataStr}`);
     },
 } satisfies ExportedHandler<Env>;
