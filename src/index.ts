@@ -160,9 +160,20 @@ export default {
                 .setProtectedHeader({ alg: 'HS256' })
                 .setIssuedAt()
                 .setExpirationTime('2h')
-                .sign(secret)
+                .sign(secret);
 
-            return new Response(JSON.stringify({ token }), { headers: { 'Content-Type': 'application/json' } })
+            const stmt = env.DB.prepare("SELECT * FROM user");
+            const dbData = await stmt.run();
+            const dbDataStr = JSON.stringify(dbData);
+            console.log("sql query returnValue=", dbDataStr);
+            const rt_data = {
+                code: 0,
+                body: {
+                    token: token,
+                    userList: dbData
+                }
+            };
+            return new Response(JSON.stringify(rt_data), { headers: { 'Content-Type': 'application/json' } })
         }
 
         if (!userId) {
@@ -222,14 +233,6 @@ export default {
         //await stub.runBiz(userId);
 
         //let lockFlag = await stub.increment();
-
-
-        const stmt = env.DB.prepare("SELECT * FROM user");
-        const dbData = await stmt.run();
-        const dbDataStr = JSON.stringify(dbData);
-        console.log("sql query returnValue=", dbDataStr);
-
-
 
         return new Response(`Durable Object 加锁标识: ${localLockFlag}  时间=${localDateStr}，数据=${dbDataStr}`);
     },
