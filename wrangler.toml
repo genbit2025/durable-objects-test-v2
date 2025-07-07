@@ -1,7 +1,7 @@
 name = "durable-objects-test-v2"
 main = "src/index.ts"
 compatibility_date = "2025-07-07"
-#compatibility_flags = ["nodejs_compat"]
+compatibility_flags = ["nodejs_compat"]
 [observability]
 enabled = true
 
